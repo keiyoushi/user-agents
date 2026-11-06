@@ -12,7 +12,7 @@ const mobileRegex = new RegExp('^Mozilla\\/5\\.0 \\((iPhone|iPad|Android|Linux; 
 const desktopUserAgents = [];
 const mobileUserAgents = [];
 
-$('.ua-textarea').map((_index, el) => {
+$('textarea').map((_index, el) => {
     const userAgent = $(el).text().trim();
     if (!userAgent.startsWith('Mozilla/5.0 (')) {
         return;
@@ -25,10 +25,15 @@ $('.ua-textarea').map((_index, el) => {
     }
 });
 
+// Fail the workflow instead of publishing empty lists when the page layout changes.
+if (desktopUserAgents.length === 0 || mobileUserAgents.length === 0) {
+    throw new Error(`Scraped ${desktopUserAgents.length} desktop and ${mobileUserAgents.length} mobile user agents`);
+}
+
 const userAgents = {
     recommended: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0',
-    desktop: desktopUserAgents.sort(),
-    mobile: mobileUserAgents.sort(),
+    desktop: [...new Set(desktopUserAgents)].sort(),
+    mobile: [...new Set(mobileUserAgents)].sort(),
 };
 
 const buildDir = './build';
